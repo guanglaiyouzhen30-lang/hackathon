@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # データベース (PostgreSQL)
+  # ==========================================
+  db:
+    image: postgres:16-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=hackathon_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres_password
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  # ==========================================
+  # バックエンド (Django / Python 3.12)
+  # ==========================================
+  backend:
+    build:
+      context: ./backend
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=hackathon_db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres_password
+    depends_on:
+      - db
+    # 起動コマンド（コンテナ起動時に実行）
+    command: >
+      bash -c "python manage.py runserver 0.0.0.0:8000"
+
+  # ==========================================
+  # フロントエンド (React / Node.js 20)
+  # ==========================================
+  frontend:
+    build:
+      context: ./frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules # 【重要】ホストOSとコンテナのnode_modulesを切り離す
+    ports:
+      - "5173:5173"
+    environment:
+      # 【重要】Windows環境(Docker Desktop)でViteのホットリロードを確実に効かせるための設定
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - backend
+    # Viteをネットワークに公開して起動
+    command: npm run dev -- --host 0.0.0.0
+
+volumes:
+  postgres_data:

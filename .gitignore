@@ -82,6 +82,29 @@ target/
 profile_default/
 ipython_config.py
 
+# =========================
+# Frontend (Node.js / React)
+# =========================
+# 依存関係パッケージ（絶対にPushしない！）
+node_modules/
+
+# ビルドの出力結果
+dist/
+build/
+
+# ログファイル
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================
+# OS / Editor (Windows & macOS共通)
+# =========================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
 # pyenv
 #   For a library or package, you might want to ignore these files since the code is
 #   intended to run in multiple environments; otherwise, check them in:
